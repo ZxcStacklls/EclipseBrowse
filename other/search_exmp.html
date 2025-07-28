@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EclipseBrowse – Демонстрация поисковой системы</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --accent: #8f7df3;
+      --highlight: #00ffff;
+      --text: #e0e0ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .content-wrapper {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+    }
+    header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo-container {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--highlight));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+    }
+    .logo-container img { width: 80%; }
+    .search-box {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+    }
+    .search-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    main {
+      padding: 20px;
+    }
+    .result {
+      margin-bottom: 28px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      transition: background 0.2s ease;
+    }
+    .result:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .result a.title {
+      color: var(--highlight);
+      font-size: 1.2rem;
+      text-decoration: none;
+      word-break: break-word;
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .result a.title:hover {
+      text-decoration: underline;
+    }
+    .result .url {
+      font-size: 0.85rem;
+      color: #8f7df3;
+      margin-bottom: 8px;
+      display: block;
+      word-break: break-all;
+    }
+    .result .snippet {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: rgba(224,224,255,0.9);
+    }
+    .result .snippet .highlight {
+      color: var(--highlight);
+      font-weight: 500;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: #666;
+      background-color: var(--bg);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 40px;
+      width: 100%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    main {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="content-wrapper">
+    <header>
+    <div class="logo-container">
+      <img src="assets/EclipseLogo.png" alt="Logo">
+    </div>
+    <div class="search-box">
+      <input id="searchInput" type="text" placeholder="Search the universe…" onkeypress="onKey(event)">
+    </div>
+  </header>
+
+  <main id="results">
+    <!-- Результаты будут здесь -->
+    </main>
+
+    <div class="footer">EclipseBrowse © 2025 — Discover Beyond</div>
+  </div>
+
+  <script>
+    const API_KEY = 'YOUR_API_KEY';   // замените на свой ключ
+    const CX      = 'YOUR_CX';        // замените на свой ID поисковой системы
+
+    // Получаем параметр q из URL
+    function getQuery() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('q') || '';
+    }
+
+    // Обработка Enter
+    function onKey(e) {
+      if (e.key === 'Enter') {
+        const q = e.target.value.trim();
+        if (q) {
+          window.location.search = '?q=' + encodeURIComponent(q);
+        }
+      }
+    }
+
+    async function doSearch(query) {
+      const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX}&q=${encodeURIComponent(query)}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.error('Ошибка API:', res.statusText);
+        return;
+      }
+      const data = await res.json();
+      renderResults(data);
+    }
+
+    function renderResults(data) {
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+      if (!data.items || data.items.length === 0) {
+        container.innerHTML = '<p>Ничего не найдено.</p>';
+        return;
+      }
+      data.items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'result';
+        div.innerHTML = `
+          <a class="url" href="${item.link}" target="_blank">${item.displayLink}</a>
+          <a class="title" href="${item.link}" target="_blank">${item.title}</a>
+          <p class="snippet">${item.snippet}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Инициализация
+    const q = getQuery();
+    document.getElementById('searchInput').value = q;
+    if (q) {
+      doSearch(q);
+    } else {
+      showExamples();
+    }
+
+    function showExamples() {
+      const container = document.getElementById('results');
+      container.innerHTML = `
+        <div class="result">
+          <a class="url" href="https://eclipsebrowse.com" target="_blank">eclipsebrowse.com</a>
+          <a class="title" href="https://eclipsebrowse.com" target="_blank">EclipseBrowse — современная поисковая система</a>
+          <p class="snippet">EclipseBrowse предлагает <span class="highlight">быстрый и релевантный поиск</span> с акцентом на конфиденциальность пользователей. Начните вводить запрос, чтобы увидеть результаты в реальном времени.</p>
+        </div>
+        <div class="result">
+          <a class="url" href="https://eclipsebrowse.com/technology" target="_blank">eclipsebrowse.com/technology</a>
+          <a class="title" href="https://eclipsebrowse.com/technology" target="_blank">Технологии EclipseBrowse</a>
+          <p class="snippet">Наша поисковая система использует <span class="highlight">искусственный интеллект</span> и машинное обучение для понимания контекста запросов и предоставления наиболее точных результатов.</p>
+        </div>
+        <div class="result">
+          <a class="url" href="https://eclipsebrowse.com/privacy" target="_blank">eclipsebrowse.com/privacy</a>
+          <a class="title" href="https://eclipsebrowse.com/privacy" target="_blank">Конфиденциальность в EclipseBrowse</a>
+          <p class="snippet">Мы не сохраняем историю поиска и не используем cookies для отслеживания. Ваши данные остаются <span class="highlight">полностью анонимными</span>.</p>
+        </div>
+        <div class="result">
+          <a class="url" href="https://eclipsebrowse.com/features" target="_blank">eclipsebrowse.com/features</a>
+          <a class="title" href="https://eclipsebrowse.com/features" target="_blank">Уникальные возможности EclipseBrowse</a>
+          <p class="snippet">Расширенный поиск по изображениям, <span class="highlight">поиск по дате</span>, фильтрация по типу контента и другие профессиональные инструменты для точного поиска.</p>
+        </div>
+      `;
+    }
+  </script>
+
+</body>
+</html>

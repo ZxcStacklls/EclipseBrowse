@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EclipseBrowse - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --accent: #8f7df3;
+      --highlight: #00ffff;
+      --text: #e0e0ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Segoe UI', sans-serif;
+      color: var(--text);
+    }
+
+    body {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stars, .twinkle, .glow {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background-repeat: repeat;
+      background-size: contain;
+      pointer-events: none;
+    }
+
+    .stars {
+      background-image: url('https://raw.githubusercontent.com/mkhairi/starfield/master/starfield.png');
+      animation: moveStars 60s linear infinite;
+      opacity: 0.08;
+      z-index: 0;
+    }
+
+    .twinkle {
+      background-image: radial-gradient(#ffffff33 1px, transparent 1px);
+      background-size: 4px 4px;
+      animation: twinkle 4s infinite ease-in-out alternate;
+      z-index: 0;
+    }
+
+    .glow {
+      background: radial-gradient(circle, rgba(143,125,243,0.15) 0%, transparent 60%);
+      animation: pulseGlow 8s infinite ease-in-out;
+      z-index: 0;
+    }
+
+    .logo-container {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--highlight));
+      padding: 4px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 30px rgba(143, 125, 243, 0.4);
+      animation: pulse 4s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, var(--accent), var(--highlight));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeIn 2s ease;
+      z-index: 2;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .search-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.2rem 2rem;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: glow 3s infinite alternate;
+      z-index: 2;
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 1rem;
+      width: 300px;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: #888;
+      z-index: 2;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px var(--accent); }
+      100% { box-shadow: 0 0 20px var(--highlight); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.05; transform: scale(1); }
+      50% { opacity: 0.2; transform: scale(1.1); }
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.05; transform: translate(0, 0); }
+      100% { opacity: 0.15; transform: translate(-10px, -10px); }
+    }
+
+    @keyframes moveStars {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-100px, -100px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="twinkle"></div>
+  <div class="glow"></div>
+
+  <div class="logo-container">
+    <img src="assets/EclipseLogo.png" alt="Eclipse Logo">
+  </div>
+
+  <h1>Where do you want to be today?</h1>
+
+  <div class="search-box">
+    <input type="text" placeholder="Search the universe..." onkeypress="handleKey(event)">
+  </div>
+
+  <div class="footer">EclipseBrowse © 2025 — Discover Beyond</div>
+
+  <script>
+    function handleKey(e) {
+      if (e.key === "Enter") {
+        let query = e.target.value.trim();
+        if (query) {
+          if (query.includes('.') && !query.includes(' ')) {
+            if (!/^https?:\/\//i.test(query)) query = 'http://' + query;
+            window.location.href = query;
+          } else {
+            window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
